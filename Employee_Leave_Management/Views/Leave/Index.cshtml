@@ -1,0 +1,158 @@
+﻿@model IEnumerable<Employee_Leave_Management.Models.LeaveRequest>
+
+@{
+    ViewData["Title"] = "Leave Management";
+}
+
+<div class="p-6 space-y-6">
+    <!-- Top Header & Action Button -->
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800">Leave Requests</h1>
+            <p class="text-sm text-slate-500">Manage employee leave requests and approvals.</p>
+        </div>
+
+    </div>
+
+    <!-- Table Section -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <table class="w-full text-left border-collapse text-sm">
+            <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase text-xs font-semibold">
+                <tr>
+                    <th class="py-3 px-4">Employee</th>
+                    <th class="py-3 px-4">From Date</th>
+                    <th class="py-3 px-4">To Date</th>
+                    <th class="py-3 px-4">Reason</th>
+                    <th class="py-3 px-4">Status</th>
+                    <th class="py-3 px-4 text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700">
+                @if (Model != null && Model.Any())
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="py-3 px-4 font-medium text-slate-900">@item.EmployeeName</td>
+                            <td class="py-3 px-4">@item.FromDate.ToShortDateString()</td>
+                            <td class="py-3 px-4">@item.ToDate.ToShortDateString()</td>
+                            <td class="py-3 px-4 max-w-xs truncate">@item.Reason</td>
+                            <td class="py-3 px-4">
+                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold
+                                    @(item.LeaveStatus == "Approved" ? "bg-emerald-100 text-emerald-800" :
+                                      item.LeaveStatus == "Rejected" ? "bg-rose-100 text-rose-800" : "bg-amber-100 text-amber-800")">
+                                    @item.LeaveStatus
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 flex justify-center gap-2">
+                                <form asp-action="UpdateStatus" asp-controller="Leave" method="post" class="inline">
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <input type="hidden" name="status" value="Approved" />
+                                    <button type="submit" class="px-3 py-1 bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-600 hover:text-white rounded-md text-xs font-semibold transition">Approve</button>
+                                </form>
+                                <form asp-action="UpdateStatus" asp-controller="Leave" method="post" class="inline">
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <input type="hidden" name="status" value="Rejected" />
+                                    <button type="submit" class="px-3 py-1 bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-600 hover:text-white rounded-md text-xs font-semibold transition">Reject</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="py-8 text-center text-slate-400">
+                            No leave requests found. Click <strong>Apply For Leave</strong> to create one.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- APPLY LEAVE MODAL -->
+<div id="applyLeaveModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+    <div class="bg-white w-full max-w-xl rounded-2xl shadow-2xl border border-slate-100 overflow-hidden">
+
+        <!-- Modal Header -->
+        <div class="px-6 py-4 bg-slate-900 text-white flex justify-between items-center">
+            <h3 class="text-base font-bold tracking-wide uppercase flex items-center gap-2">
+                <i class="fa-solid fa-calendar-plus text-teal-400"></i> Apply for Leave
+            </h3>
+            <button type="button" onclick="closeApplyLeaveModal()" class="text-slate-400 hover:text-white transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Single Form Body -->
+        <form asp-controller="Leave" asp-action="Create" method="post" class="p-6 space-y-5">
+            @Html.AntiForgeryToken()
+
+            <!-- Select Employee -->
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                    Select Employee:
+                </label>
+                <div class="relative">
+                    <select name="EmployeeName"
+                            asp-items="ViewBag.EmployeeList"
+                            required
+                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 appearance-none focus:outline-none focus:border-indigo-500 focus:bg-white transition">
+                        <option value="" disabled selected>Select Employee Name</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                        <i class="fa-solid fa-chevron-down text-xs"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- From Date & To Date Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                        From Date:
+                    </label>
+                    <input type="date" name="FromDate" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                        To Date:
+                    </label>
+                    <input type="date" name="ToDate" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition">
+                </div>
+            </div>
+
+            <!-- Reason for Leave -->
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                    Reason for Leave:
+                </label>
+                <textarea name="Reason" rows="3" placeholder="Write your reason here..." required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition resize-none"></textarea>
+            </div>
+
+            <!-- Footer Buttons -->
+            <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button type="button" onclick="closeApplyLeaveModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-sm font-semibold transition">
+                    Cancel
+                </button>
+                <button type="submit" class="px-6 py-2.5 bg-[#00897B] hover:bg-[#00796B] text-white rounded-lg text-sm font-semibold transition shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-paper-plane text-xs"></i> Submit Leave
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Toggle Script -->
+<script>
+    function openApplyLeaveModal() {
+        document.getElementById('applyLeaveModal').classList.remove('hidden');
+    }
+
+    function closeApplyLeaveModal() {
+        document.getElementById('applyLeaveModal').classList.add('hidden');
+    }
+</script>

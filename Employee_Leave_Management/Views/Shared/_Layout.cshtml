@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Employee Leave Management</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body class="bg-[#F8FAFC] font-sans antialiased text-slate-800 m-0 p-0">
+
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- DARK LEFT SIDEBAR (The missing portion) -->
+        <aside class="w-64 bg-[#1E1E38] text-gray-300 flex flex-col justify-between p-4 flex-shrink-0">
+            <div>
+                <!-- Logo -->
+                <div class="flex items-center gap-3 px-3 py-4 mb-6">
+                    <div class="w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-feather-pointed text-lg"></i>
+                    </div>
+                    <span class="text-white font-bold tracking-wider text-base">LEAVEFLOW</span>
+                </div>
+
+
+                <!-- Navigation Links -->
+                <nav class="flex flex-col space-y-2">
+                    <a asp-controller="Home" asp-action="Index"
+                       class="flex items-center gap-3 px-4 py-3 text-indigo-200 bg-indigo-600/30 border-l-4 border-indigo-500 rounded-r-lg font-medium transition-all">
+                        <i class="fa-solid fa-border-all text-lg w-5"></i>
+                        <span>Dashboard</span>
+                    </a>
+
+                    <a asp-controller="Employee" asp-action="Index"
+                       class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg font-medium transition-all">
+                        <i class="fa-solid fa-user-group text-lg w-5"></i>
+                        <span>Manage Employees</span>
+                    </a>
+
+                    <a asp-controller="Leave" asp-action="Index"
+                       class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg font-medium transition-all">
+                        <i class="fa-solid fa-calendar-check text-lg w-5"></i>
+                        <span>My Leave Requests</span>
+                    </a>
+
+                    <a asp-controller="Leave" asp-action="Reports" class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-xl transition">
+                        <i class="fa-solid fa-chart-pie text-lg"></i>
+                        <span class="font-medium text-sm">Reports</span>
+                    </a>
+
+                </nav>
+            </div>
+
+            <!-- Footer -->
+            <div class="text-xs text-slate-500 px-3 py-2 border-t border-slate-800">
+                &copy; 2026 - Leave Management
+            </div>
+        </aside>
+
+        <!-- RIGHT MAIN CONTENT AREA -->
+        <main class="flex-1 overflow-y-auto">
+            @RenderBody()
+        </main>
+
+    </div>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
